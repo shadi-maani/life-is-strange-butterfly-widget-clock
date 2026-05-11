@@ -24,6 +24,8 @@ WIDGET_NAME="LiS Butterfly Clock"
 ASSETS_DIR="${WIDGET_DIR}/contents/assets"
 FONTS=("CabinSketch-Bold.ttf" "DuduCalligraphy.ttf")
 USER_FONT_DIR="${HOME}/.local/share/fonts"
+ICON_NAME="lis-butterfly-clock"
+ICON_DIR="${HOME}/.local/share/icons/hicolor"
 
 # ─── Helper Functions ────────────────────────────────────
 print_header() {
@@ -107,6 +109,45 @@ install_fonts() {
     fi
 }
 
+# ─── Install Icon ────────────────────────────────────────
+install_icon() {
+    info "Installing widget icon..."
+    local icon_src="${ASSETS_DIR}/${ICON_NAME}.png"
+
+    if [[ ! -f "${icon_src}" ]]; then
+        warn "Icon file not found: ${icon_src}"
+        warn "Widget may show a generic icon in the widget browser."
+        return
+    fi
+
+    # Install to multiple sizes for best compatibility
+    for size in 48 64 128; do
+        local dest_dir="${ICON_DIR}/${size}x${size}/apps"
+        mkdir -p "${dest_dir}"
+        # Resize if python3+PIL available, otherwise just copy
+        if python3 -c "from PIL import Image" 2>/dev/null; then
+            python3 -c "
+from PIL import Image
+img = Image.open('${icon_src}')
+img = img.resize((${size}, ${size}), Image.LANCZOS)
+img.save('${dest_dir}/${ICON_NAME}.png')
+" 2>/dev/null
+        else
+            cp "${icon_src}" "${dest_dir}/${ICON_NAME}.png"
+        fi
+    done
+
+    # Update icon cache
+    if command -v gtk-update-icon-cache &>/dev/null; then
+        gtk-update-icon-cache -f -t "${ICON_DIR}" 2>/dev/null || true
+    fi
+    if command -v xdg-icon-resource &>/dev/null; then
+        xdg-icon-resource forceupdate 2>/dev/null || true
+    fi
+
+    success "Widget icon installed."
+}
+
 # ─── Install Widget ─────────────────────────────────────
 install_widget() {
     info "Installing widget: ${BOLD}${WIDGET_NAME}${NC}"
@@ -158,6 +199,15 @@ uninstall_widget() {
         fc-cache -f "${USER_FONT_DIR}" 2>/dev/null
     fi
 
+    # Remove icon from hicolor theme
+    for size in 48 64 128; do
+        rm -f "${ICON_DIR}/${size}x${size}/apps/${ICON_NAME}.png"
+    done
+    if command -v gtk-update-icon-cache &>/dev/null; then
+        gtk-update-icon-cache -f -t "${ICON_DIR}" 2>/dev/null || true
+    fi
+    success "Widget icon removed."
+
     echo ""
     success "Uninstall complete. Please restart Plasma or log out/in."
     exit 0
@@ -177,6 +227,8 @@ main() {
 
     echo ""
     install_fonts
+    echo ""
+    install_icon
     echo ""
     install_widget
 
