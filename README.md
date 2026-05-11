@@ -15,7 +15,8 @@
 - **Dynamic Butterflies** — Butterfly 1 tracks the minutes digit, Butterfly 2 tracks the hours digit
 - **Neon Glow Effect** using Qt6 `MultiEffect` shadow system
 - **Authentic Subtitle** — *"This action will have consequences..."* in Dudu Calligraphy font with a companion butterfly
-- **Fully Customizable** — change neon color, text colors, wing flap speed, and floating speed from widget settings
+- **Fully Customizable** — change neon color, text colors, glow sharpness, wing flap speed, and floating speed from widget settings
+- **Subtitle Controls** — hide the subtitle entirely or change the text to your own custom phrase
 - **Restore Defaults** button to reset everything with one click
 - **Transparent Background** — blends seamlessly with any desktop wallpaper
 - **Built for Plasma 6** — uses `PlasmoidItem`, JSON metadata, and modern QML
@@ -72,6 +73,9 @@ chmod +x install.sh
 | Subtitle Text Color | Color of the consequences text | `#dff2ff` |
 | Wing Flap Speed | Butterfly wing animation speed (ms) | `180` |
 | Floating Speed | Butterfly floating animation speed (ms) | `2800` |
+| Glow Sharpness | Adjusts the radius and intensity of the neon blur | `16` |
+| Visibility | Toggle the subtitle and companion butterfly on or off | `Checked` |
+| Subtitle Text | Custom text to display below the clock | *"This action..."* |
 
 ---
 
