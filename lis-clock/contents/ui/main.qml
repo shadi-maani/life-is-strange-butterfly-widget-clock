@@ -190,7 +190,8 @@ PlasmoidItem {
                 MultiEffect {
                     source: htText; anchors.fill: htText
                     shadowEnabled: true; shadowColor: root.neonColor
-                    shadowBlur: 1.0; blurMax: Math.max(1, root.glowStrength) * 3
+                    shadowBlur: Math.min(1.0, root.glowStrength / 25.0)
+                    blurMax: 64
                     shadowHorizontalOffset: 0; shadowVerticalOffset: 0
                     autoPaddingEnabled: true
                 }
@@ -212,7 +213,8 @@ PlasmoidItem {
                 MultiEffect {
                     source: hoText; anchors.fill: hoText
                     shadowEnabled: true; shadowColor: root.neonColor
-                    shadowBlur: 1.0; blurMax: Math.max(1, root.glowStrength) * 3
+                    shadowBlur: Math.min(1.0, root.glowStrength / 25.0)
+                    blurMax: 64
                     shadowHorizontalOffset: 0; shadowVerticalOffset: 0
                     autoPaddingEnabled: true
                 }
@@ -234,7 +236,8 @@ PlasmoidItem {
                 MultiEffect {
                     source: colonText; anchors.fill: colonText
                     shadowEnabled: true; shadowColor: root.neonColor
-                    shadowBlur: 1.0; blurMax: Math.max(1, root.glowStrength) * 3
+                    shadowBlur: Math.min(1.0, root.glowStrength / 25.0)
+                    blurMax: 64
                     autoPaddingEnabled: true
                 }
                 SequentialAnimation on opacity {
@@ -260,7 +263,8 @@ PlasmoidItem {
                 MultiEffect {
                     source: mtText; anchors.fill: mtText
                     shadowEnabled: true; shadowColor: root.neonColor
-                    shadowBlur: 1.0; blurMax: Math.max(1, root.glowStrength) * 3
+                    shadowBlur: Math.min(1.0, root.glowStrength / 25.0)
+                    blurMax: 64
                     shadowHorizontalOffset: 0; shadowVerticalOffset: 0
                     autoPaddingEnabled: true
                 }
@@ -282,7 +286,8 @@ PlasmoidItem {
                 MultiEffect {
                     source: moText; anchors.fill: moText
                     shadowEnabled: true; shadowColor: root.neonColor
-                    shadowBlur: 1.0; blurMax: Math.max(1, root.glowStrength) * 3
+                    shadowBlur: Math.min(1.0, root.glowStrength / 25.0)
+                    blurMax: 64
                     shadowHorizontalOffset: 0; shadowVerticalOffset: 0
                     autoPaddingEnabled: true
                 }
@@ -436,7 +441,8 @@ PlasmoidItem {
         MultiEffect {
             source: subtitleRow; anchors.fill: subtitleRow
             shadowEnabled: true; shadowColor: root.neonColor
-            shadowBlur: 0.7; blurMax: Math.max(1, root.glowStrength)
+            shadowBlur: Math.min(1.0, root.glowStrength / 25.0)
+            blurMax: 32
             autoPaddingEnabled: true
             visible: subtitleRow.visible
         }
