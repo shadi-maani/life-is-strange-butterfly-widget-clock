@@ -28,5 +28,8 @@
         <entry name="glowStrength" type="Int">
             <default>16</default>
         </entry>
+        <entry name="flickerInterval" type="Int">
+            <default>5000</default>
+        </entry>
     </group>
 </kcfg>

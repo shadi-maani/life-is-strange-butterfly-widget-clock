@@ -17,6 +17,7 @@ KCM.SimpleKCM {
     property alias cfg_showSubtitle: showSubtitleCheckbox.checked
     property alias cfg_subtitleText: subtitleTextField.text
     property alias cfg_glowStrength: glowSpinBox.value
+    property alias cfg_flickerInterval: flickerSpinBox.value
 
     // ─── Default values (required by Plasma 6) ───
     property color cfg_neonColorDefault: "#00aaff"
@@ -27,6 +28,7 @@ KCM.SimpleKCM {
     property bool cfg_showSubtitleDefault: true
     property string cfg_subtitleTextDefault: "This action will have consequences..."
     property int cfg_glowStrengthDefault: 16
+    property int cfg_flickerIntervalDefault: 5000
 
     Kirigami.FormLayout {
 
@@ -69,6 +71,14 @@ KCM.SimpleKCM {
             Kirigami.FormData.label: i18n("Glow Sharpness (Radius):")
         }
 
+        QQC2.SpinBox {
+            id: flickerSpinBox
+            from: 1000
+            to: 30000
+            stepSize: 500
+            Kirigami.FormData.label: i18n("Subtitle Flicker Interval (ms):")
+        }
+
         Item {
             Kirigami.FormData.isSection: true
         }
@@ -101,6 +111,7 @@ KCM.SimpleKCM {
                 showSubtitleCheckbox.checked = cfg_showSubtitleDefault
                 subtitleTextField.text = cfg_subtitleTextDefault
                 glowSpinBox.value = cfg_glowStrengthDefault
+                flickerSpinBox.value = cfg_flickerIntervalDefault
             }
         }
     }

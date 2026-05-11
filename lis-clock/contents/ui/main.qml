@@ -18,8 +18,10 @@ PlasmoidItem {
     property color neonColor: Plasmoid.configuration.neonColor
     property color textColor: Plasmoid.configuration.textColor
     property color subtitleColor: Plasmoid.configuration.subtitleColor
-    property int flapDuration: Plasmoid.configuration.flapDuration
-    property int floatDuration: Plasmoid.configuration.floatDuration
+    property int flapDuration: Plasmoid.configuration.flapDuration || 180
+    property int floatDuration: Plasmoid.configuration.floatDuration || 2800
+    property int glowStrength: Plasmoid.configuration.glowStrength || 16
+    property int flickerInterval: Plasmoid.configuration.flickerInterval || 5000
 
 
     // ─── Fonts ───
@@ -72,6 +74,9 @@ PlasmoidItem {
                 b2FloatAnim.restart()
                 b2RotAnim.restart()
                 b3FloatAnim.restart()
+            }
+            function onFlickerIntervalChanged() {
+                b3FlickerTimer.restart()
             }
         }
 
@@ -185,7 +190,7 @@ PlasmoidItem {
                 MultiEffect {
                     source: htText; anchors.fill: htText
                     shadowEnabled: true; shadowColor: root.neonColor
-                    shadowBlur: 1.0; blurMax: Plasmoid.configuration.glowStrength * 3
+                    shadowBlur: 1.0; blurMax: Math.max(1, root.glowStrength) * 3
                     shadowHorizontalOffset: 0; shadowVerticalOffset: 0
                     autoPaddingEnabled: true
                 }
@@ -207,7 +212,7 @@ PlasmoidItem {
                 MultiEffect {
                     source: hoText; anchors.fill: hoText
                     shadowEnabled: true; shadowColor: root.neonColor
-                    shadowBlur: 1.0; blurMax: Plasmoid.configuration.glowStrength * 3
+                    shadowBlur: 1.0; blurMax: Math.max(1, root.glowStrength) * 3
                     shadowHorizontalOffset: 0; shadowVerticalOffset: 0
                     autoPaddingEnabled: true
                 }
@@ -229,7 +234,7 @@ PlasmoidItem {
                 MultiEffect {
                     source: colonText; anchors.fill: colonText
                     shadowEnabled: true; shadowColor: root.neonColor
-                    shadowBlur: 1.0; blurMax: Plasmoid.configuration.glowStrength * 3
+                    shadowBlur: 1.0; blurMax: Math.max(1, root.glowStrength) * 3
                     autoPaddingEnabled: true
                 }
                 SequentialAnimation on opacity {
@@ -255,7 +260,7 @@ PlasmoidItem {
                 MultiEffect {
                     source: mtText; anchors.fill: mtText
                     shadowEnabled: true; shadowColor: root.neonColor
-                    shadowBlur: 1.0; blurMax: Plasmoid.configuration.glowStrength * 3
+                    shadowBlur: 1.0; blurMax: Math.max(1, root.glowStrength) * 3
                     shadowHorizontalOffset: 0; shadowVerticalOffset: 0
                     autoPaddingEnabled: true
                 }
@@ -277,7 +282,7 @@ PlasmoidItem {
                 MultiEffect {
                     source: moText; anchors.fill: moText
                     shadowEnabled: true; shadowColor: root.neonColor
-                    shadowBlur: 1.0; blurMax: Plasmoid.configuration.glowStrength * 3
+                    shadowBlur: 1.0; blurMax: Math.max(1, root.glowStrength) * 3
                     shadowHorizontalOffset: 0; shadowVerticalOffset: 0
                     autoPaddingEnabled: true
                 }
@@ -399,12 +404,13 @@ PlasmoidItem {
                 SequentialAnimation on y {
                     id: b3FloatAnim
                     loops: Animation.Infinite
-                    NumberAnimation { from: butterfly3.y; to: butterfly3.y - 4; duration: Math.max(100, root.floatDuration); easing.type: Easing.InOutSine }
-                    NumberAnimation { from: butterfly3.y - 4; to: butterfly3.y; duration: Math.max(100, root.floatDuration); easing.type: Easing.InOutSine }
+                    NumberAnimation { from: butterfly3.y; to: butterfly3.y - 15; duration: Math.max(100, root.floatDuration); easing.type: Easing.InOutSine }
+                    NumberAnimation { from: butterfly3.y - 15; to: butterfly3.y; duration: Math.max(100, root.floatDuration); easing.type: Easing.InOutSine }
                 }
 
                 Timer {
-                    interval: 3200
+                    id: b3FlickerTimer
+                    interval: Math.max(1000, root.flickerInterval)
                     running: true; repeat: true
                     onTriggered: b3Flicker.restart()
                 }
@@ -430,7 +436,7 @@ PlasmoidItem {
         MultiEffect {
             source: subtitleRow; anchors.fill: subtitleRow
             shadowEnabled: true; shadowColor: root.neonColor
-            shadowBlur: 0.7; blurMax: Plasmoid.configuration.glowStrength
+            shadowBlur: 0.7; blurMax: Math.max(1, root.glowStrength)
             autoPaddingEnabled: true
             visible: subtitleRow.visible
         }
