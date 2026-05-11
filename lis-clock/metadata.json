@@ -3,7 +3,7 @@
         "Id": "com.shadi.lisclock",
         "Name": "LiS Butterfly Clock",
         "Description": "Life is Strange themed clock with animated butterflies and neon glow.",
-        "Icon": "preferences-desktop-clock",
+        "Icon": "icon.png",
         "Authors": [
             {
                 "Name": "Shadi"

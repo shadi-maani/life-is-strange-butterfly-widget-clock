@@ -19,5 +19,14 @@
         <entry name="floatDuration" type="Int">
             <default>2800</default>
         </entry>
+        <entry name="showSubtitle" type="Bool">
+            <default>true</default>
+        </entry>
+        <entry name="subtitleText" type="String">
+            <default>This action will have consequences...</default>
+        </entry>
+        <entry name="glowStrength" type="Int">
+            <default>16</default>
+        </entry>
     </group>
 </kcfg>

@@ -185,7 +185,7 @@ PlasmoidItem {
                 MultiEffect {
                     source: htText; anchors.fill: htText
                     shadowEnabled: true; shadowColor: root.neonColor
-                    shadowBlur: 1.0; blurMax: 48
+                    shadowBlur: 1.0; blurMax: Plasmoid.configuration.glowStrength * 3
                     shadowHorizontalOffset: 0; shadowVerticalOffset: 0
                     autoPaddingEnabled: true
                 }
@@ -207,7 +207,7 @@ PlasmoidItem {
                 MultiEffect {
                     source: hoText; anchors.fill: hoText
                     shadowEnabled: true; shadowColor: root.neonColor
-                    shadowBlur: 1.0; blurMax: 48
+                    shadowBlur: 1.0; blurMax: Plasmoid.configuration.glowStrength * 3
                     shadowHorizontalOffset: 0; shadowVerticalOffset: 0
                     autoPaddingEnabled: true
                 }
@@ -229,7 +229,7 @@ PlasmoidItem {
                 MultiEffect {
                     source: colonText; anchors.fill: colonText
                     shadowEnabled: true; shadowColor: root.neonColor
-                    shadowBlur: 1.0; blurMax: 48
+                    shadowBlur: 1.0; blurMax: Plasmoid.configuration.glowStrength * 3
                     autoPaddingEnabled: true
                 }
                 SequentialAnimation on opacity {
@@ -255,7 +255,7 @@ PlasmoidItem {
                 MultiEffect {
                     source: mtText; anchors.fill: mtText
                     shadowEnabled: true; shadowColor: root.neonColor
-                    shadowBlur: 1.0; blurMax: 48
+                    shadowBlur: 1.0; blurMax: Plasmoid.configuration.glowStrength * 3
                     shadowHorizontalOffset: 0; shadowVerticalOffset: 0
                     autoPaddingEnabled: true
                 }
@@ -277,7 +277,7 @@ PlasmoidItem {
                 MultiEffect {
                     source: moText; anchors.fill: moText
                     shadowEnabled: true; shadowColor: root.neonColor
-                    shadowBlur: 1.0; blurMax: 48
+                    shadowBlur: 1.0; blurMax: Plasmoid.configuration.glowStrength * 3
                     shadowHorizontalOffset: 0; shadowVerticalOffset: 0
                     autoPaddingEnabled: true
                 }
@@ -386,7 +386,8 @@ PlasmoidItem {
             anchors.top: clockRow.bottom
             anchors.topMargin: 12
             anchors.horizontalCenter: parent.horizontalCenter
-            spacing: 8
+            spacing: 16
+            visible: Plasmoid.configuration.showSubtitle
 
             Image {
                 id: butterfly3
@@ -401,11 +402,24 @@ PlasmoidItem {
                     NumberAnimation { from: butterfly3.y; to: butterfly3.y - 4; duration: Math.max(100, root.floatDuration); easing.type: Easing.InOutSine }
                     NumberAnimation { from: butterfly3.y - 4; to: butterfly3.y; duration: Math.max(100, root.floatDuration); easing.type: Easing.InOutSine }
                 }
+
+                Timer {
+                    interval: 3200
+                    running: true; repeat: true
+                    onTriggered: b3Flicker.restart()
+                }
+                SequentialAnimation {
+                    id: b3Flicker
+                    NumberAnimation { target: butterfly3; property: "opacity"; to: 0.3; duration: 50 }
+                    NumberAnimation { target: butterfly3; property: "opacity"; to: 0.85; duration: 50 }
+                    NumberAnimation { target: butterfly3; property: "opacity"; to: 0.5; duration: 60 }
+                    NumberAnimation { target: butterfly3; property: "opacity"; to: 0.85; duration: 90 }
+                }
             }
 
             Text {
                 id: subText
-                text: "This action will have consequences..."
+                text: Plasmoid.configuration.subtitleText || "This action will have consequences..."
                 font.family: duduFont.name
                 font.pixelSize: 16
                 color: root.subtitleColor
@@ -416,8 +430,9 @@ PlasmoidItem {
         MultiEffect {
             source: subtitleRow; anchors.fill: subtitleRow
             shadowEnabled: true; shadowColor: root.neonColor
-            shadowBlur: 0.7; blurMax: 16
+            shadowBlur: 0.7; blurMax: Plasmoid.configuration.glowStrength
             autoPaddingEnabled: true
+            visible: subtitleRow.visible
         }
     }
 }
