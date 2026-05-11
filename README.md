@@ -5,7 +5,11 @@
 </p>
 
 <p align="center">
-  <img src="preview.png" width="800" alt="LiS Butterfly Clock Preview">
+  <img src="preview-video.gif" width="800" alt="LiS Butterfly Clock Animation">
+</p>
+
+<p align="center">
+  <img src="preview-image.png" width="800" alt="LiS Butterfly Clock Settings">
 </p>
 
 ## Features
