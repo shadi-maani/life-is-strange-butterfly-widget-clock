@@ -1,0 +1,29 @@
+name: Build and Release Plasmoid
+
+on:
+  push:
+    tags:
+      - 'v*' # Trigger the workflow automatically when you push a tag like v1.1, v1.2, etc.
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Required permission to create a GitHub Release
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Package Plasmoid
+        run: |
+          cd lis-clock
+          # Zip all contents inside lis-clock into a .plasmoid file
+          zip -r ../lis-butterfly-clock.plasmoid *
+          cd ..
+
+      - name: Publish Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: lis-butterfly-clock.plasmoid
+          generate_release_notes: true # Auto-generates release notes based on commit history
