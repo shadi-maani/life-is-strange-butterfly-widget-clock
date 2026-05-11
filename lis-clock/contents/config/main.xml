@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kcfg xmlns="http://www.kde.org/standards/kcfg/1.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.kde.org/standards/kcfg/1.0
+      http://www.kde.org/standards/kcfg/1.0/kcfg.xsd">
+    <group name="General">
+        <entry name="neonColor" type="Color">
+            <default>#00aaff</default>
+        </entry>
+        <entry name="textColor" type="Color">
+            <default>#dff2ff</default>
+        </entry>
+        <entry name="subtitleColor" type="Color">
+            <default>#dff2ff</default>
+        </entry>
+        <entry name="flapDuration" type="Int">
+            <default>180</default>
+        </entry>
+        <entry name="floatDuration" type="Int">
+            <default>2800</default>
+        </entry>
+    </group>
+</kcfg>

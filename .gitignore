@@ -1,0 +1,27 @@
+# KDE / Qt build artifacts
+*.o
+*.so
+*.qmlc
+*.jsc
+CMakeFiles/
+CMakeCache.txt
+build/
+Makefile
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+.directory
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Misc
+*.log
+*.bak

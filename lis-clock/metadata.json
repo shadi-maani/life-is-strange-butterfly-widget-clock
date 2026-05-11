@@ -1,0 +1,20 @@
+{
+    "KPlugin": {
+        "Id": "com.shadi.lisclock",
+        "Name": "LiS Butterfly Clock",
+        "Description": "Life is Strange themed clock with animated butterflies and neon glow.",
+        "Icon": "preferences-desktop-clock",
+        "Authors": [
+            {
+                "Name": "Shadi"
+            }
+        ],
+        "Category": "Date and Time",
+        "Version": "1.0"
+    },
+    "X-Plasma-API-Minimum-Version": "6.0",
+    "KPackageStructure": "Plasma/Applet",
+    "X-Plasma-Provides": [
+        "org.kde.plasma.time"
+    ]
+}
