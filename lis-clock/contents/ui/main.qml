@@ -402,15 +402,17 @@ PlasmoidItem {
             Image {
                 id: butterfly3
                 source: "../assets/darkroombutterfly3.png"
-                width: 18; height: 18
+                width: 22; height: 22
                 anchors.verticalCenter: parent.verticalCenter
-                opacity: 0.85
 
-                SequentialAnimation on y {
+                property real floatY: 0
+                transform: Translate { y: butterfly3.floatY }
+
+                SequentialAnimation on floatY {
                     id: b3FloatAnim
                     loops: Animation.Infinite
-                    NumberAnimation { from: butterfly3.y; to: butterfly3.y - 15; duration: Math.max(100, root.floatDuration); easing.type: Easing.InOutSine }
-                    NumberAnimation { from: butterfly3.y - 15; to: butterfly3.y; duration: Math.max(100, root.floatDuration); easing.type: Easing.InOutSine }
+                    NumberAnimation { from: 0; to: -6; duration: Math.max(100, root.floatDuration); easing.type: Easing.InOutSine }
+                    NumberAnimation { from: -6; to: 0; duration: Math.max(100, root.floatDuration); easing.type: Easing.InOutSine }
                 }
 
                 Timer {
@@ -421,10 +423,10 @@ PlasmoidItem {
                 }
                 SequentialAnimation {
                     id: b3Flicker
-                    NumberAnimation { target: butterfly3; property: "opacity"; to: 0.3; duration: 50 }
-                    NumberAnimation { target: butterfly3; property: "opacity"; to: 0.85; duration: 50 }
-                    NumberAnimation { target: butterfly3; property: "opacity"; to: 0.5; duration: 60 }
-                    NumberAnimation { target: butterfly3; property: "opacity"; to: 0.85; duration: 90 }
+                    NumberAnimation { target: butterfly3; property: "opacity"; to: 0.15; duration: 60 }
+                    NumberAnimation { target: butterfly3; property: "opacity"; to: 0.9;  duration: 60 }
+                    NumberAnimation { target: butterfly3; property: "opacity"; to: 0.35; duration: 70 }
+                    NumberAnimation { target: butterfly3; property: "opacity"; to: 0.9;  duration: 100 }
                 }
             }
 
