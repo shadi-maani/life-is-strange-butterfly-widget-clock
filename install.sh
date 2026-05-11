@@ -112,37 +112,46 @@ install_fonts() {
 # ─── Install Icon ────────────────────────────────────────
 install_icon() {
     info "Installing widget icon..."
-    local icon_src="${ASSETS_DIR}/${ICON_NAME}.png"
+    local icon_png="${ASSETS_DIR}/${ICON_NAME}.png"
+    local icon_svg="${ASSETS_DIR}/${ICON_NAME}.svg"
 
-    if [[ ! -f "${icon_src}" ]]; then
-        warn "Icon file not found: ${icon_src}"
+    if [[ ! -f "${icon_png}" && ! -f "${icon_svg}" ]]; then
+        warn "Icon files not found in assets."
         warn "Widget may show a generic icon in the widget browser."
         return
     fi
 
-    # Install to multiple sizes for best compatibility
-    for size in 48 64 128; do
-        local dest_dir="${ICON_DIR}/${size}x${size}/apps"
-        mkdir -p "${dest_dir}"
-        # Resize if python3+PIL available, otherwise just copy
-        if python3 -c "from PIL import Image" 2>/dev/null; then
-            python3 -c "
+    # Install PNG to multiple fixed sizes
+    if [[ -f "${icon_png}" ]]; then
+        for size in 48 64 128 256; do
+            local dest_dir="${ICON_DIR}/${size}x${size}/apps"
+            mkdir -p "${dest_dir}"
+            if python3 -c "from PIL import Image" 2>/dev/null; then
+                python3 -c "
 from PIL import Image
-img = Image.open('${icon_src}')
+img = Image.open('${icon_png}')
 img = img.resize((${size}, ${size}), Image.LANCZOS)
 img.save('${dest_dir}/${ICON_NAME}.png')
 " 2>/dev/null
-        else
-            cp "${icon_src}" "${dest_dir}/${ICON_NAME}.png"
-        fi
-    done
+            else
+                cp "${icon_png}" "${dest_dir}/${ICON_NAME}.png"
+            fi
+        done
+    fi
 
-    # Update icon cache
+    # Install SVG to scalable (highest priority for KDE icon lookup)
+    if [[ -f "${icon_svg}" ]]; then
+        local scalable_dir="${ICON_DIR}/scalable/apps"
+        mkdir -p "${scalable_dir}"
+        cp "${icon_svg}" "${scalable_dir}/${ICON_NAME}.svg"
+    fi
+
+    # Rebuild all icon/system caches so Plasma can find the new icon
     if command -v gtk-update-icon-cache &>/dev/null; then
         gtk-update-icon-cache -f -t "${ICON_DIR}" 2>/dev/null || true
     fi
-    if command -v xdg-icon-resource &>/dev/null; then
-        xdg-icon-resource forceupdate 2>/dev/null || true
+    if command -v kbuildsycoca6 &>/dev/null; then
+        kbuildsycoca6 2>/dev/null || true
     fi
 
     success "Widget icon installed."
@@ -200,11 +209,15 @@ uninstall_widget() {
     fi
 
     # Remove icon from hicolor theme
-    for size in 48 64 128; do
+    for size in 48 64 128 256; do
         rm -f "${ICON_DIR}/${size}x${size}/apps/${ICON_NAME}.png"
     done
+    rm -f "${ICON_DIR}/scalable/apps/${ICON_NAME}.svg"
     if command -v gtk-update-icon-cache &>/dev/null; then
         gtk-update-icon-cache -f -t "${ICON_DIR}" 2>/dev/null || true
+    fi
+    if command -v kbuildsycoca6 &>/dev/null; then
+        kbuildsycoca6 2>/dev/null || true
     fi
     success "Widget icon removed."
 
