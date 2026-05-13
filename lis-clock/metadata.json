@@ -10,7 +10,7 @@
             }
         ],
         "Category": "Date and Time",
-        "Version": "1.0"
+        "Version": "2.0"
     },
     "X-Plasma-API-Minimum-Version": "6.0",
     "KPackageStructure": "Plasma/Applet",

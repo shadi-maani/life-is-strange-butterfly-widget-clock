@@ -3,6 +3,7 @@ import QtQuick.Layouts
 import org.kde.plasma.plasmoid
 import org.kde.plasma.core as PlasmaCore
 import QtQuick.Effects
+import "components"
 
 PlasmoidItem {
     id: root
@@ -22,6 +23,9 @@ PlasmoidItem {
     property int floatDuration: Plasmoid.configuration.floatDuration || 2800
     property int glowStrength: Plasmoid.configuration.glowStrength || 16
     property int flickerInterval: Plasmoid.configuration.flickerInterval || 5000
+    property color topButterflyColor: Plasmoid.configuration.topButterflyColor || "#84cff9"
+    property bool use24HourFormat: Plasmoid.configuration.use24HourFormat
+    property bool showAMPM: Plasmoid.configuration.showAMPM
 
 
     // ─── Fonts ───
@@ -51,11 +55,13 @@ PlasmoidItem {
         property string hourOnes: "0"
         property string minuteTens: "0"
         property string minuteOnes: "0"
+        property string ampmString: "AM"
 
         Timer {
             interval: 1000
             running: true
             repeat: true
+            triggeredOnStart: true
             onTriggered: visualRoot.updateTime()
         }
 
@@ -65,18 +71,22 @@ PlasmoidItem {
         Connections {
             target: root
             function onFlapDurationChanged() {
-                b1ScaleAnim.restart()
-                b2ScaleAnim.restart()
+                butterfly1.restartScale()
+                butterfly2.restartScale()
             }
             function onFloatDurationChanged() {
-                b1FloatAnim.restart()
-                b1RotAnim.restart()
-                b2FloatAnim.restart()
-                b2RotAnim.restart()
-                b3FloatAnim.restart()
+                butterfly1.restartFloatAndRotation()
+                butterfly2.restartFloatAndRotation()
+                subtitleBar.restartFloat()
             }
             function onFlickerIntervalChanged() {
-                b3FlickerTimer.restart()
+                subtitleBar.restartFlickerTimer()
+            }
+            function onUse24HourFormatChanged() {
+                visualRoot.updateTime()
+            }
+            function onShowAMPMChanged() {
+                visualRoot.updateTime()
             }
         }
 
@@ -85,12 +95,14 @@ PlasmoidItem {
             var h = now.getHours()
             var m = now.getMinutes()
 
-            // 12-hour format
-            var h12 = h % 12
-            if (h12 === 0) h12 = 12
+            var displayH = h
+            if (!root.use24HourFormat) {
+                displayH = h % 12
+                if (displayH === 0) displayH = 12
+            }
 
-            var ht = Math.floor(h12 / 10).toString()
-            var ho = (h12 % 10).toString()
+            var ht = Math.floor(displayH / 10).toString()
+            var ho = (displayH % 10).toString()
             var mt = Math.floor(m / 10).toString()
             var mo = (m % 10).toString()
 
@@ -98,355 +110,119 @@ PlasmoidItem {
             if (hourOnes   !== ho) hourOnes   = ho
             if (minuteTens !== mt) minuteTens = mt
             if (minuteOnes !== mo) minuteOnes = mo
+
+            var ap = h >= 12 ? "PM" : "AM"
+            if (ampmString !== ap) ampmString = ap
         }
 
         // ─── Digit-change reactions ───
         onMinuteOnesChanged: {
-            moGlitch.restart()
-            b1React.restart()
+            if (!Plasmoid.configuration.lowPowerMode) {
+                moGlitch.restart()
+                butterfly1.react()
+            }
         }
-        onMinuteTensChanged: mtGlitch.restart()
+        onMinuteTensChanged: {
+            if (!Plasmoid.configuration.lowPowerMode) mtGlitch.restart()
+        }
         onHourOnesChanged: {
-            hoGlitch.restart()
-            b2React.restart()
+            if (!Plasmoid.configuration.lowPowerMode) {
+                hoGlitch.restart()
+                butterfly2.react()
+            }
         }
-        onHourTensChanged: htGlitch.restart()
+        onHourTensChanged: {
+            if (!Plasmoid.configuration.lowPowerMode) htGlitch.restart()
+        }
 
         // ─── Glitch animations ───
-        SequentialAnimation {
-            id: moGlitch
-            NumberAnimation { target: moText; property: "opacity"; to: 0.1; duration: 50 }
-            NumberAnimation { target: moText; property: "opacity"; to: 0.9; duration: 40 }
-            NumberAnimation { target: moText; property: "opacity"; to: 0.15; duration: 45 }
-            NumberAnimation { target: moText; property: "opacity"; to: 1.0; duration: 90 }
-        }
-        SequentialAnimation {
-            id: mtGlitch
-            NumberAnimation { target: mtText; property: "opacity"; to: 0.1; duration: 50 }
-            NumberAnimation { target: mtText; property: "opacity"; to: 0.9; duration: 40 }
-            NumberAnimation { target: mtText; property: "opacity"; to: 0.15; duration: 45 }
-            NumberAnimation { target: mtText; property: "opacity"; to: 1.0; duration: 90 }
-        }
-        SequentialAnimation {
-            id: hoGlitch
-            NumberAnimation { target: hoText; property: "opacity"; to: 0.1; duration: 50 }
-            NumberAnimation { target: hoText; property: "opacity"; to: 0.9; duration: 40 }
-            NumberAnimation { target: hoText; property: "opacity"; to: 0.15; duration: 45 }
-            NumberAnimation { target: hoText; property: "opacity"; to: 1.0; duration: 90 }
-        }
-        SequentialAnimation {
-            id: htGlitch
-            NumberAnimation { target: htText; property: "opacity"; to: 0.1; duration: 50 }
-            NumberAnimation { target: htText; property: "opacity"; to: 0.9; duration: 40 }
-            NumberAnimation { target: htText; property: "opacity"; to: 0.15; duration: 45 }
-            NumberAnimation { target: htText; property: "opacity"; to: 1.0; duration: 90 }
-        }
+        GlitchAnimation { id: moGlitch; targetItem: clockRow.moText }
+        GlitchAnimation { id: mtGlitch; targetItem: clockRow.mtText }
+        GlitchAnimation { id: hoGlitch; targetItem: clockRow.hoText }
+        GlitchAnimation { id: htGlitch; targetItem: clockRow.htText }
 
-        // ─── Butterfly reaction to digit change ───
-        SequentialAnimation {
-            id: b1React
-            ParallelAnimation {
-                NumberAnimation { target: butterfly1; property: "scale"; to: 1.4; duration: 250; easing.type: Easing.OutBack }
-                NumberAnimation { target: butterfly1; property: "opacity"; to: 0.3; duration: 80 }
-            }
-            ParallelAnimation {
-                NumberAnimation { target: butterfly1; property: "scale"; to: 1.0; duration: 500; easing.type: Easing.InOutCubic }
-                NumberAnimation { target: butterfly1; property: "opacity"; to: 1.0; duration: 250 }
-            }
-        }
-        SequentialAnimation {
-            id: b2React
-            ParallelAnimation {
-                NumberAnimation { target: butterfly2; property: "scale"; to: 1.4; duration: 250; easing.type: Easing.OutBack }
-                NumberAnimation { target: butterfly2; property: "opacity"; to: 0.3; duration: 80 }
-            }
-            ParallelAnimation {
-                NumberAnimation { target: butterfly2; property: "scale"; to: 1.0; duration: 500; easing.type: Easing.InOutCubic }
-                NumberAnimation { target: butterfly2; property: "opacity"; to: 1.0; duration: 250 }
-            }
-        }
+
 
         // ─────── CLOCK DIGITS ROW ───────
-        Row {
+        ClockRow {
             id: clockRow
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.verticalCenter: parent.verticalCenter
             anchors.verticalCenterOffset: -18
-            spacing: 2
 
-            // H-tens
-            Item {
-                id: htBox
-                width: visualRoot.digitBoxWidth; height: visualRoot.digitSize
-                Text {
-                    id: htText
-                    text: visualRoot.hourTens
-                    font.family: sketchFont.name
-                    font.pixelSize: visualRoot.digitSize
-                    font.bold: true
-                    color: root.textColor
-                    anchors.centerIn: parent
-                }
-                MultiEffect {
-                    source: htText; anchors.fill: htText
-                    shadowEnabled: true; shadowColor: root.neonColor
-                    shadowBlur: Math.min(1.0, root.glowStrength / 25.0)
-                    blurMax: 64
-                    shadowHorizontalOffset: 0; shadowVerticalOffset: 0
-                    autoPaddingEnabled: true
-                }
-            }
+            hourTensText: visualRoot.hourTens
+            hourOnesText: visualRoot.hourOnes
+            minuteTensText: visualRoot.minuteTens
+            minuteOnesText: visualRoot.minuteOnes
+            ampmText: visualRoot.ampmString
 
-            // H-ones (b2 butterfly tracks this)
-            Item {
-                id: hoBox
-                width: visualRoot.digitBoxWidth; height: visualRoot.digitSize
-                Text {
-                    id: hoText
-                    text: visualRoot.hourOnes
-                    font.family: sketchFont.name
-                    font.pixelSize: visualRoot.digitSize
-                    font.bold: true
-                    color: root.textColor
-                    anchors.centerIn: parent
-                }
-                MultiEffect {
-                    source: hoText; anchors.fill: hoText
-                    shadowEnabled: true; shadowColor: root.neonColor
-                    shadowBlur: Math.min(1.0, root.glowStrength / 25.0)
-                    blurMax: 64
-                    shadowHorizontalOffset: 0; shadowVerticalOffset: 0
-                    autoPaddingEnabled: true
-                }
-            }
+            use24HourFormat: root.use24HourFormat
+            showAMPM: root.showAMPM
+            lowPowerMode: Plasmoid.configuration.lowPowerMode
 
-            // Colon
-            Item {
-                id: colonBox
-                width: 24; height: visualRoot.digitSize
-                Text {
-                    id: colonText
-                    text: ":"
-                    font.family: sketchFont.name
-                    font.pixelSize: visualRoot.digitSize
-                    font.bold: true
-                    color: root.textColor
-                    anchors.centerIn: parent
-                }
-                MultiEffect {
-                    source: colonText; anchors.fill: colonText
-                    shadowEnabled: true; shadowColor: root.neonColor
-                    shadowBlur: Math.min(1.0, root.glowStrength / 25.0)
-                    blurMax: 64
-                    autoPaddingEnabled: true
-                }
-                SequentialAnimation on opacity {
-                    loops: Animation.Infinite
-                    NumberAnimation { to: 0.3; duration: 600; easing.type: Easing.InOutSine }
-                    NumberAnimation { to: 1.0; duration: 600; easing.type: Easing.InOutSine }
-                }
-            }
-
-            // M-tens
-            Item {
-                id: mtBox
-                width: visualRoot.digitBoxWidth; height: visualRoot.digitSize
-                Text {
-                    id: mtText
-                    text: visualRoot.minuteTens
-                    font.family: sketchFont.name
-                    font.pixelSize: visualRoot.digitSize
-                    font.bold: true
-                    color: root.textColor
-                    anchors.centerIn: parent
-                }
-                MultiEffect {
-                    source: mtText; anchors.fill: mtText
-                    shadowEnabled: true; shadowColor: root.neonColor
-                    shadowBlur: Math.min(1.0, root.glowStrength / 25.0)
-                    blurMax: 64
-                    shadowHorizontalOffset: 0; shadowVerticalOffset: 0
-                    autoPaddingEnabled: true
-                }
-            }
-
-            // M-ones (b1 butterfly tracks this)
-            Item {
-                id: moBox
-                width: visualRoot.digitBoxWidth; height: visualRoot.digitSize
-                Text {
-                    id: moText
-                    text: visualRoot.minuteOnes
-                    font.family: sketchFont.name
-                    font.pixelSize: visualRoot.digitSize
-                    font.bold: true
-                    color: root.textColor
-                    anchors.centerIn: parent
-                }
-                MultiEffect {
-                    source: moText; anchors.fill: moText
-                    shadowEnabled: true; shadowColor: root.neonColor
-                    shadowBlur: Math.min(1.0, root.glowStrength / 25.0)
-                    blurMax: 64
-                    shadowHorizontalOffset: 0; shadowVerticalOffset: 0
-                    autoPaddingEnabled: true
-                }
-            }
+            digitSize: visualRoot.digitSize
+            digitBoxWidth: visualRoot.digitBoxWidth
+            textColor: root.textColor
+            neonColor: root.neonColor
+            glowStrength: root.glowStrength
+            fontName: sketchFont.name
         }
 
         // ─────── BUTTERFLY 1 — minutes ───────
-        Image {
+        TopButterfly {
             id: butterfly1
-            source: "../assets/butterfly1.png"
-            width: 42; height: 42
-            transformOrigin: Item.Center
-
-            property real floatY: 0
-
-            x: clockRow.x + moBox.x + moBox.width * 0.3 - width * 0.5
-            y: clockRow.y + moBox.y - height * 0.55 + floatY
-
-            SequentialAnimation on floatY {
-                id: b1FloatAnim
-                loops: Animation.Infinite
-                NumberAnimation { from: 0; to: -14; duration: Math.max(100, root.floatDuration); easing.type: Easing.InOutSine }
-                NumberAnimation { from: -14; to: 0; duration: Math.max(100, root.floatDuration); easing.type: Easing.InOutSine }
-            }
-
-            SequentialAnimation on scale {
-                id: b1ScaleAnim
-                loops: Animation.Infinite
-                NumberAnimation { from: 1.0; to: 0.82; duration: Math.max(50, root.flapDuration); easing.type: Easing.InOutQuad }
-                NumberAnimation { from: 0.82; to: 1.0; duration: Math.max(50, root.flapDuration); easing.type: Easing.InOutQuad }
-                PauseAnimation { duration: 120 }
-            }
-
-            SequentialAnimation on rotation {
-                id: b1RotAnim
-                loops: Animation.Infinite
-                NumberAnimation { from: -6; to: 8; duration: Math.max(100, root.floatDuration + 400); easing.type: Easing.InOutSine }
-                NumberAnimation { from: 8; to: -6; duration: Math.max(100, root.floatDuration + 400); easing.type: Easing.InOutSine }
-            }
-
-            Timer {
-                interval: 1800
-                running: true; repeat: true
-                onTriggered: b1Flicker.restart()
-            }
-            SequentialAnimation {
-                id: b1Flicker
-                NumberAnimation { target: butterfly1; property: "opacity"; to: 0.25; duration: 45 }
-                NumberAnimation { target: butterfly1; property: "opacity"; to: 1.0;  duration: 45 }
-                NumberAnimation { target: butterfly1; property: "opacity"; to: 0.45; duration: 40 }
-                NumberAnimation { target: butterfly1; property: "opacity"; to: 1.0;  duration: 80 }
-            }
+            imageSource: "../../assets/butterfly1.png"
+            size: 42
+            topButterflyColor: root.topButterflyColor
+            floatDuration: root.floatDuration
+            floatTo: -14
+            flapDuration: root.flapDuration
+            flapScaleTo: 0.82
+            x: clockRow.x + clockRow.moBox.x + clockRow.moBox.width * 0.3 - width * 0.5
+            y: clockRow.y + clockRow.moBox.y - height * 0.55
+            isVisible: Plasmoid.configuration.showTopButterflies
+            lowPowerMode: Plasmoid.configuration.lowPowerMode
+            z: 10
         }
 
         // ─────── BUTTERFLY 2 — hours ───────
-        Image {
+        TopButterfly {
             id: butterfly2
-            source: "../assets/butterfly2.png"
-            width: 34; height: 34
-            transformOrigin: Item.Center
-
-            property real floatY: 0
-
-            x: clockRow.x + hoBox.x + hoBox.width * 0.7
-            y: clockRow.y + hoBox.y - height * 0.45 + floatY
-
-            SequentialAnimation on floatY {
-                id: b2FloatAnim
-                loops: Animation.Infinite
-                NumberAnimation { from: 0; to: -11; duration: Math.max(100, root.floatDuration - 600); easing.type: Easing.InOutSine }
-                NumberAnimation { from: -11; to: 0; duration: Math.max(100, root.floatDuration - 600); easing.type: Easing.InOutSine }
-            }
-
-            SequentialAnimation on scale {
-                id: b2ScaleAnim
-                loops: Animation.Infinite
-                NumberAnimation { from: 1.0; to: 0.78; duration: Math.max(50, root.flapDuration - 20); easing.type: Easing.InOutQuad }
-                NumberAnimation { from: 0.78; to: 1.0; duration: Math.max(50, root.flapDuration - 20); easing.type: Easing.InOutQuad }
-                PauseAnimation { duration: 200 }
-            }
-
-            SequentialAnimation on rotation {
-                id: b2RotAnim
-                loops: Animation.Infinite
-                NumberAnimation { from: 5; to: -10; duration: Math.max(100, root.floatDuration - 200); easing.type: Easing.InOutSine }
-                NumberAnimation { from: -10; to: 5; duration: Math.max(100, root.floatDuration - 200); easing.type: Easing.InOutSine }
-            }
-
-            Timer {
-                interval: 2500
-                running: true; repeat: true
-                onTriggered: b2Flicker.restart()
-            }
-            SequentialAnimation {
-                id: b2Flicker
-                NumberAnimation { target: butterfly2; property: "opacity"; to: 0.3; duration: 45 }
-                NumberAnimation { target: butterfly2; property: "opacity"; to: 1.0; duration: 45 }
-                NumberAnimation { target: butterfly2; property: "opacity"; to: 0.5; duration: 40 }
-                NumberAnimation { target: butterfly2; property: "opacity"; to: 1.0; duration: 80 }
-            }
+            imageSource: "../../assets/butterfly2.png"
+            size: 34
+            topButterflyColor: root.topButterflyColor
+            floatDuration: Math.max(100, root.floatDuration - 600)
+            floatTo: -11
+            flapDuration: Math.max(50, root.flapDuration - 20)
+            flapScaleTo: 0.78
+            rotDurationOffset: -200
+            rotFrom: 5
+            rotTo: -10
+            flickerInterval: 2500
+            flickerOpacities: [0.3, 1.0, 0.5, 1.0]
+            flickerDurations: [45, 45, 40, 80]
+            x: clockRow.x + clockRow.hoBox.x + clockRow.hoBox.width * 0.7
+            y: clockRow.y + clockRow.hoBox.y - height * 0.45
+            isVisible: Plasmoid.configuration.showTopButterflies
+            lowPowerMode: Plasmoid.configuration.lowPowerMode
+            z: 9
         }
 
         // ─────── SUBTITLE WITH BUTTERFLY ───────
-        Row {
-            id: subtitleRow
+        SubtitleBar {
+            id: subtitleBar
             anchors.top: clockRow.bottom
-            anchors.topMargin: 12
+            anchors.topMargin: -8
             anchors.horizontalCenter: parent.horizontalCenter
-            spacing: 16
-            visible: Plasmoid.configuration.showSubtitle
-
-            Image {
-                id: butterfly3
-                source: "../assets/darkroombutterfly3.png"
-                width: 22; height: 22
-                anchors.verticalCenter: parent.verticalCenter
-
-                property real floatY: 0
-                transform: Translate { y: butterfly3.floatY }
-
-                SequentialAnimation on floatY {
-                    id: b3FloatAnim
-                    loops: Animation.Infinite
-                    NumberAnimation { from: 0; to: -6; duration: Math.max(100, root.floatDuration); easing.type: Easing.InOutSine }
-                    NumberAnimation { from: -6; to: 0; duration: Math.max(100, root.floatDuration); easing.type: Easing.InOutSine }
-                }
-
-                Timer {
-                    id: b3FlickerTimer
-                    interval: Math.max(1000, root.flickerInterval)
-                    running: true; repeat: true
-                    onTriggered: b3Flicker.restart()
-                }
-                SequentialAnimation {
-                    id: b3Flicker
-                    NumberAnimation { target: butterfly3; property: "opacity"; to: 0.15; duration: 60 }
-                    NumberAnimation { target: butterfly3; property: "opacity"; to: 0.9;  duration: 60 }
-                    NumberAnimation { target: butterfly3; property: "opacity"; to: 0.35; duration: 70 }
-                    NumberAnimation { target: butterfly3; property: "opacity"; to: 0.9;  duration: 100 }
-                }
-            }
-
-            Text {
-                id: subText
-                text: Plasmoid.configuration.subtitleText || "This action will have consequences..."
-                font.family: duduFont.name
-                font.pixelSize: 16
-                color: root.subtitleColor
-                opacity: 0.85
-                anchors.verticalCenter: parent.verticalCenter
-            }
-        }
-        MultiEffect {
-            source: subtitleRow; anchors.fill: subtitleRow
-            shadowEnabled: true; shadowColor: root.neonColor
-            shadowBlur: Math.min(1.0, root.glowStrength / 25.0)
-            blurMax: 32
-            autoPaddingEnabled: true
-            visible: subtitleRow.visible
+            subtitleText: Plasmoid.configuration.subtitleText
+            subtitleColor: Plasmoid.configuration.subtitleColor
+            neonColor: Plasmoid.configuration.neonColor
+            glowStrength: Plasmoid.configuration.glowStrength
+            floatDuration: Plasmoid.configuration.floatDuration
+            flickerInterval: Plasmoid.configuration.flickerInterval
+            fontName: duduFont.name
+            isVisible: Plasmoid.configuration.showSubtitle
+            lowPowerMode: Plasmoid.configuration.lowPowerMode
         }
     }
 }

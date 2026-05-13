@@ -228,8 +228,31 @@ uninstall_widget() {
 
 # ─── Main ────────────────────────────────────────────────
 main() {
-    if [[ "${1:-}" == "--uninstall" || "${1:-}" == "-u" ]]; then
-        uninstall_widget
+    # Strict argument parsing
+    if [[ $# -gt 0 ]]; then
+        case "$1" in
+            -u|--uninstall)
+                uninstall_widget
+                ;;
+            -h|--help)
+                print_header
+                echo "Usage: ./install.sh [OPTIONS]"
+                echo ""
+                echo "By default (with no options), this script will either install the widget"
+                echo "if it's not present, or safely update/upgrade it if it already exists."
+                echo ""
+                echo "Options:"
+                echo "  -u, --uninstall   Completely remove the widget and its fonts/icons."
+                echo "  -h, --help        Show this help message and exit."
+                echo ""
+                exit 0
+                ;;
+            *)
+                error "Unknown option: $1"
+                echo "Run './install.sh --help' for usage information."
+                exit 1
+                ;;
+        esac
     fi
 
     print_header
@@ -256,6 +279,10 @@ main() {
     echo -e "    3. Drag it to your desktop"
     echo ""
     info "To customize: right-click the widget → ${BOLD}Configure${NC}"
+    echo ""
+    warn "If you just updated the widget and the changes/settings don't appear,"
+    warn "you must restart Plasma to clear its cache by running:"
+    echo -e "    ${BOLD}systemctl restart --user plasma-plasmashell.service${NC}"
     echo ""
     info "To uninstall later, run:"
     echo -e "    ${BOLD}./install.sh --uninstall${NC}"
