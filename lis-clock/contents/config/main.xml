@@ -13,11 +13,26 @@
         <entry name="subtitleColor" type="Color">
             <default>#dff2ff</default>
         </entry>
+        <entry name="topButterflyColor" type="Color">
+            <default>#84cff9</default>
+        </entry>
         <entry name="flapDuration" type="Int">
             <default>180</default>
         </entry>
         <entry name="floatDuration" type="Int">
             <default>2800</default>
+        </entry>
+        <entry name="use24HourFormat" type="Bool">
+            <default>false</default>
+        </entry>
+        <entry name="showAMPM" type="Bool">
+            <default>false</default>
+        </entry>
+        <entry name="showTopButterflies" type="Bool">
+            <default>true</default>
+        </entry>
+        <entry name="lowPowerMode" type="Bool">
+            <default>false</default>
         </entry>
         <entry name="showSubtitle" type="Bool">
             <default>true</default>

@@ -34,7 +34,7 @@
 
 ## Installation
 
-### Quick Install (Recommended)
+### Quick Install / Update (Recommended)
 
 ```bash
 git clone https://github.com/shadi-maani/life-is-strange-butterfly-widget-clock.git
@@ -42,6 +42,8 @@ cd life-is-strange-butterfly-widget-clock
 chmod +x install.sh
 ./install.sh
 ```
+
+> **Note:** The `install.sh` script is smart. If the widget is already installed, running the script again without any arguments will **automatically update** it to the latest version while safely preserving all your custom settings.
 
 ### Manual Installation
 
@@ -75,10 +77,16 @@ chmod +x install.sh
 | Neon Glow Color | Color of the glow effect on digits and text | `#00aaff` |
 | Clock Text Color | Color of the clock digits | `#dff2ff` |
 | Subtitle Text Color | Color of the consequences text | `#dff2ff` |
+| Top Butterflies Color | Color of the main animated butterflies | `#84cff9` |
 | Wing Flap Speed | Butterfly wing animation speed (ms) | `180` |
 | Floating Speed | Butterfly floating animation speed (ms) | `2800` |
 | Glow Sharpness | Adjusts the radius and intensity of the neon blur | `16` |
-| Visibility | Toggle the subtitle and companion butterfly on or off | `Checked` |
+| Subtitle Flicker Interval | How often the subtitle pulses (ms) | `5000` |
+| Time Format | Toggle between 12-Hour and 24-Hour modes | `12-Hour` |
+| Show AM/PM | Show or hide the AM/PM indicator (12-Hour only) | `Unchecked` |
+| Show Top Butterflies | Hide or show the two main animated butterflies | `Checked` |
+| Show Subtitle & Ghost Butterfly | Toggle the subtitle and bottom butterfly on or off | `Checked` |
+| Low Power Mode | Completely freeze all animations for maximum battery/CPU savings | `Unchecked` |
 | Subtitle Text | Custom text to display below the clock | *"This action..."* |
 
 ---
