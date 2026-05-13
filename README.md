@@ -60,7 +60,7 @@ chmod +x install.sh
    kpackagetool6 -t Plasma/Applet -i lis-clock
    ```
 
-> **Note:** If upgrading an existing installation, use `-u` instead of `-i`.
+> **Note (For Manual Install Only):** If you are upgrading manually using the command above, use `-u` instead of `-i`. (If you used `install.sh`, it handles this automatically!)
 
 ---
 
