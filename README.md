@@ -14,16 +14,17 @@
 
 ## Features
 
-- **12-Hour Digital Clock** with chalk-style typography (CabinSketch font)
+- **12-Hour & 24-Hour Formats** with chalk-style typography (CabinSketch font)
 - **Per-Digit Glitch Animation** — each digit flickers when it changes
 - **Dynamic Butterflies** — Butterfly 1 tracks the minutes digit, Butterfly 2 tracks the hours digit
-- **Neon Glow Effect** using Qt6 `MultiEffect` shadow system
+- **Neon Glow Effect** — ultra-smooth, clipping-free glow using Qt6 `MultiEffect`
 - **Authentic Subtitle** — *"This action will have consequences..."* in Dudu Calligraphy font with a companion butterfly
-- **Fully Customizable** — change neon color, text colors, glow sharpness, wing flap speed, and floating speed from widget settings
-- **Subtitle Controls** — hide the subtitle entirely or change the text to your own custom phrase
+- **Low Power Mode** — completely freeze all animations for maximum battery and CPU savings (0.8% footprint)
+- **Fully Customizable** — change neon colors, text colors, butterfly colors, glow sharpness, and animation speeds
+- **Visibility Controls** — toggle the top butterflies, subtitle, or AM/PM indicator on and off
 - **Restore Defaults** button to reset everything with one click
 - **Transparent Background** — blends seamlessly with any desktop wallpaper
-- **Built for Plasma 6** — uses `PlasmoidItem`, JSON metadata, and modern QML
+- **Built for Plasma 6** — uses `PlasmoidItem`, JSON metadata, and high-performance Render Thread `Animator`s
 
 ## What You Need
 
